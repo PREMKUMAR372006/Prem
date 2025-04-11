@@ -1,0 +1,87 @@
+// TravelBooking.tsx import React, { useState } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Input } from "@/components/ui/input"; import { Button } from "@/components/ui/button"; import { Calendar, Trash2 } from "lucide-react";
+
+const tickets = [ { id: 1, destination: "Bali", price: 150.0, type: "Flight", image: "https://via.placeholder.com/100" }, { id: 2, destination: "Jakarta", price: 75.5, type: "Train", image: "https://via.placeholder.com/100" }, { id: 3, destination: "Bandung", price: 60.0, type: "Bus", image: "https://via.placeholder.com/100" }, { id: 4, destination: "Surabaya", price: 130.25, type: "Flight", image: "https://via.placeholder.com/100" }, ];
+
+const types = ["All", "Flight", "Train", "Bus"];
+
+export default function TravelBooking() { const [search, setSearch] = useState(""); const [filter, setFilter] = useState("All"); const [cart, setCart] = useState([]);
+
+const filtered = tickets.filter( (t) => (filter === "All" || t.type === filter) && t.destination.toLowerCase().includes(search.toLowerCase()) );
+
+const addToCart = (ticket) => { setCart((prev) => [...prev, ticket]); };
+
+const removeFromCart = (index) => { setCart((prev) => prev.filter((_, i) => i !== index)); };
+
+const total = cart.reduce((sum, t) => sum + t.price, 0);
+
+return ( <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Ticket Section */} <div className="md:col-span-2"> <h1 className="text-3xl font-bold mb-4">Travel Ticket Booking</h1>
+
+<div className="flex gap-4 mb-6">
+      <Input
+        placeholder="Search destination..."
+        className="flex-1"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <select
+        className="border p-2 rounded-lg"
+        onChange={(e) => setFilter(e.target.value)}
+        value={filter}
+      >
+        {types.map((t) => (
+          <option key={t}>{t}</option>
+        ))}
+      </select>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filtered.map((ticket) => (
+        <Card key={ticket.id} className="shadow-lg rounded-2xl">
+          <CardContent className="p-4 text-center">
+            <img
+              src={ticket.image}
+              alt={ticket.destination}
+              className="w-24 h-24 mx-auto mb-4 rounded-full object-cover"
+            />
+            <h2 className="text-xl font-semibold">{ticket.destination}</h2>
+            <p className="text-gray-500">{ticket.type}</p>
+            <p className="text-gray-500">${ticket.price.toFixed(2)}</p>
+            <Button className="mt-4 w-full" onClick={() => addToCart(ticket)}>
+              <Calendar className="w-4 h-4 mr-2" /> Book Ticket
+            </Button>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+
+  {/* Booking Cart Section */}
+  <div>
+    <h2 className="text-2xl font-semibold mb-4">Your Bookings</h2>
+    {cart.length === 0 ? (
+      <p className="text-gray-500">No tickets booked yet.</p>
+    ) : (
+      <div className="space-y-4">
+        {cart.map((item, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center border-b pb-2"
+          >
+            <div>
+              <p className="font-medium">{item.destination}</p>
+              <p className="text-sm text-gray-500">{item.type} - ${item.price.toFixed(2)}</p>
+            </div>
+            <Button variant="ghost" onClick={() => removeFromCart(index)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <div className="pt-4 border-t font-semibold text-right">
+          Total: ${total.toFixed(2)}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+); }
